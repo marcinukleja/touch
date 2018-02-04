@@ -2,6 +2,7 @@
   "name": "touch",
   "version": "1.0.0",
   "description": "Let's touch",
+  "repository": "https://github.com/marcinukleja/touch",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
