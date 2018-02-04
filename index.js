@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
   })
 })
 
-http..listen(process.env.PORT || 5000, () => {
+http.listen(process.env.PORT || 5000, () => {
   // This port should go to browser address
   // Google says: "You must be sure that your application code is listening on 8080."
 
