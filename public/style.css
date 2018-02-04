@@ -1,0 +1,53 @@
+html,
+body {
+    background-color: #000;
+    color: #fff;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body,
+body * {
+    font-family: -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    padding: 16px;
+}
+
+#status {
+    color: #333;
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+}
+
+#touch-other {
+    width: 64px;
+    height: 64px;
+    border: 4px solid white;
+    position: absolute;
+    opacity: 0.25;
+    top: 0;
+    left: 0;
+    -webkit-transform: translate(-32px, -32px);
+    transform: translate(-32px, -32px);
+    border-radius: 50%;
+}
+
+#touch-local {
+    width: 64px;
+    height: 64px;
+    border: 4px solid white;
+    position: absolute;
+    opacity: 1;
+    top: 0;
+    left: 0;
+    -webkit-transform: translate(-32px, -32px);
+    transform: translate(-32px, -32px);
+    border-radius: 50%;
+}
