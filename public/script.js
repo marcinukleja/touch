@@ -19,15 +19,15 @@ function setupConnection() {
 };
 
 function addListeners() {
-  document.addEventListener('mousemove', throttle(onTouchMove, 10), false);
+  document.addEventListener('touchmove', throttle(onTouchMove, 10), false);
 
 };
 
 function onTouchMove(e) {
   e.preventDefault();
-  //        var touch = e.touches[0];
-  //        var touchX = touch.pageX;
-  //        var touchY = touch.pageY;
+  var touch = e.touches[0];
+  var touchX = touch.pageX;
+  var touchY = touch.pageY;
 
   var touchX = e.pageX;
   var touchY = e.pageY;
