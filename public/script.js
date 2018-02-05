@@ -2,6 +2,7 @@ var socket = io();
 
 $(document).ready(function() {
   // console.log("ready!");
+  e.preventDefault();
   addListeners();
   setupConnection();
 });
@@ -15,6 +16,12 @@ function setupConnection() {
 
     var owner = $("#touch-other");
     moveTouch(owner, touchX, touchY);
+  });
+
+  socket.on('connect', () => {
+    // console.log(socket);
+    // var numberOfClients = socket.io.engine.clientsCount;
+    // $('#status').html(numberOfClients)
   })
 };
 
@@ -22,6 +29,10 @@ function addListeners() {
   document.addEventListener('touchmove', throttle(onTouchMove, 10), false);
 
 };
+
+function onTouchStart(e) {
+
+}
 
 function onTouchMove(e) {
   e.preventDefault();

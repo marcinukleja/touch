@@ -12,6 +12,7 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
 
   console.log('USER CONNECTED');
+  updateNumberOfClients();
 
   // On TOUCH
   socket.on('touch', (coords) => {
@@ -20,6 +21,7 @@ io.on('connection', (socket) => {
 
   // On DISCONNECT
   socket.on('disconnect', () => {
+    updateNumberOfClients();
     console.log('USER DISCONNECTED'); // Can't fire
   })
 })
@@ -30,3 +32,8 @@ http.listen(process.env.PORT || 5000, () => {
 
   console.log('Listening…');
 });
+
+function updateNumberOfClients() {
+  var numberOfClients = io.engine.clientsCount;
+  console.log(numberOfClients);
+}
