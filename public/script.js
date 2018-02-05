@@ -2,7 +2,6 @@ var socket = io();
 
 $(document).ready(function() {
   // console.log("ready!");
-  e.preventDefault();
   addListeners();
   setupConnection();
 });
