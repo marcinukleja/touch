@@ -19,28 +19,29 @@ function setupConnection() {
 };
 
 function addListeners() {
-  document.addEventListener('mousemove', function(e) {
-    e.preventDefault();
-    //        var touch = e.touches[0];
-    //        var touchX = touch.pageX;
-    //        var touchY = touch.pageY;
-
-    var touchX = e.pageX;
-    var touchY = e.pageY;
-
-    var data = {
-      x: touchX,
-      y: touchY
-    }
-
-    sendTouchData(data);
-
-    var owner = $("#touch-local");
-    moveTouch(owner, touchX, touchY);
-
-  }, false);
+  document.addEventListener('mousemove', throttle(onTouchMove, 10), false);
 
 };
+
+function onTouchMove(e) {
+  e.preventDefault();
+  //        var touch = e.touches[0];
+  //        var touchX = touch.pageX;
+  //        var touchY = touch.pageY;
+
+  var touchX = e.pageX;
+  var touchY = e.pageY;
+
+  var data = {
+    x: touchX,
+    y: touchY
+  };
+
+  sendTouchData(data);
+
+  var owner = $("#touch-local");
+  moveTouch(owner, touchX, touchY);
+}
 
 function sendTouchData(data) {
   socket.emit('touch', data);
@@ -52,4 +53,17 @@ function moveTouch(owner, x, y) {
     left: x,
     top: y
   });
+}
+
+// limit the number of events per second
+function throttle(callback, delay) {
+  var previousCall = new Date().getTime();
+  return function() {
+    var time = new Date().getTime();
+
+    if ((time - previousCall) >= delay) {
+      previousCall = time;
+      callback.apply(null, arguments);
+    }
+  };
 }
