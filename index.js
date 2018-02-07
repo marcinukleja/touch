@@ -11,29 +11,27 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
 
-  console.log('USER CONNECTED');
-  updateNumberOfClients();
+  console.log('NODE: user connected');
 
-  // On TOUCH
-  socket.on('touch', (coords) => {
-    socket.broadcast.emit('touch', coords)
+  // On TOUCHMOVE
+  socket.on('touchmove', (coords) => {
+    socket.broadcast.emit('touchmove', coords)
+  })
+  // On TOUCHSTART
+  socket.on('touchstart', (coords) => {
+    socket.broadcast.emit('touchstart', coords)
+  })
+  // On TOUCHEND
+  socket.on('touchend', (coords) => {
+    socket.broadcast.emit('touchend', coords)
   })
 
   // On DISCONNECT
   socket.on('disconnect', () => {
-    updateNumberOfClients();
-    console.log('USER DISCONNECTED'); // Can't fire
+    console.log('NODE: user disconnected'); // Can't fire
   })
 })
 
 http.listen(process.env.PORT || 5000, () => {
-  // This port should go to browser address
-  // Google says: "You must be sure that your application code is listening on 8080."
-
   console.log('Listening…');
 });
-
-function updateNumberOfClients() {
-  var numberOfClients = io.engine.clientsCount;
-  console.log(numberOfClients);
-}
