@@ -20,8 +20,8 @@ function setupConnection() {
   socket.on('touchstart', (coords) => {
     console.log("RECEIVED: touchstart");
 
-    $("#touch-other").fadeIn();
-
+    $("#touch-other").addClass("touching");
+    $("body").addClass("touching");
 
     var touchX = coords.x;
     var touchY = coords.y;
@@ -33,9 +33,16 @@ function setupConnection() {
   socket.on('touchend', (didHappen) => {
     console.log("RECEIVED: touchend");
 
-    $("#touch-other").fadeOut();
+    $("#touch-other").addClass("touching").delay(0).queue(function() {
+      $(this).removeClass("touching").dequeue();
+    });
 
-    $("#touch-other").fadeOut;
+    $("body").addClass("touching").delay(0).queue(function() {
+      $(this).removeClass("touching").dequeue();
+    });
+
+    // add class in case of short websocket times
+
   });
 
 
@@ -62,7 +69,8 @@ function onTouchStart(e) {
   e.preventDefault();
 
   // Set style
-  $("#touch-local").fadeIn();
+  $("#touch-local").addClass("touching");
+
 
   // Gather coordinates
   var touch = e.touches[0];
@@ -87,7 +95,7 @@ function onTouchEnd(e) {
   e.preventDefault();
 
   // Set style
-  $("#touch-local").fadeOut();
+  $("#touch-local").removeClass("touching");
 
   socket.emit("touchend", false)
 
