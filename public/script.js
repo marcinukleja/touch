@@ -1,4 +1,12 @@
 var socket = io();
+var localCoords = {
+  x: 0,
+  y: 0
+}
+var otherCoords = {
+  x: 0,
+  y: 0
+}
 
 $(document).ready(function() {
   console.log("DOCUMENT READY");
@@ -7,58 +15,61 @@ $(document).ready(function() {
 });
 
 function setupConnection() {
+
+  // CONNECT
+  socket.on('connect', () => {
+    console.log("RECEIVED: connect");
+  });
+
+  // TOUCHMOVE
   socket.on('touchmove', (coords) => {
     console.log("RECEIVED: touchmove");
 
-    var touchX = coords.x;
-    var touchY = coords.y;
+    otherCoords = coords;
 
     var owner = $("#touch-other");
-    moveTouch(owner, touchX, touchY);
+    moveTouch(owner, coords);
   });
 
+  // TOUCHSTART
   socket.on('touchstart', (coords) => {
     console.log("RECEIVED: touchstart");
 
-    $("#touch-other").addClass("touching");
-    $("body").addClass("touching");
+    otherCoords = coords;
 
-    var touchX = coords.x;
-    var touchY = coords.y;
+    $("#touch-other").addClass("touching");
+    // $("body").addClass("touching");
 
     var owner = $("#touch-other");
-    moveTouch(owner, touchX, touchY);
+    moveTouch(owner, coords);
   });
 
+  // TOUCHEND
   socket.on('touchend', (didHappen) => {
     console.log("RECEIVED: touchend");
 
-    $("#touch-other").addClass("touching").delay(0).queue(function() {
+    $("#touch-other").addClass("touching").delay(125).queue(function() {
       $(this).removeClass("touching").dequeue();
     });
 
-    $("body").addClass("touching").delay(0).queue(function() {
-      $(this).removeClass("touching").dequeue();
-    });
+    $("body").removeClass("real-touch");
 
-    // add class in case of short websocket times
+
+    // $("body").addClass("touching").delay(125).queue(function() {
+    //   $(this).removeClass("touching").dequeue();
+    // });
 
   });
-
-
-  socket.on('connect', () => {
-    console.log("RECEIVED: connect");
-    // var numberOfClients = socket.io.engine.clientsCount;
-    // $('#status').html(numberOfClients)
-  })
 };
 
 function addListeners() {
+  // TOUCHMOVE
   document.addEventListener('touchmove', throttle(onTouchMove, 10), false);
+  // TOUCHSTART
   document.addEventListener('touchstart', (e) => {
     onTouchStart(e);
   }, false);
-
+  // TOUCHEND
   document.addEventListener('touchend', (e) => {
     onTouchEnd(e);
   }, false);
@@ -71,23 +82,22 @@ function onTouchStart(e) {
   // Set style
   $("#touch-local").addClass("touching");
 
-
   // Gather coordinates
   var touch = e.touches[0];
   var touchX = touch.pageX;
   var touchY = touch.pageY;
 
   // Set & send data object
-  var data = {
+  var coords = {
     x: touchX,
     y: touchY
   };
 
-  sendTouchData("touchstart", data);
+  sendTouchData("touchstart", coords);
 
   // Move Touch indicator
   var owner = $("#touch-local");
-  moveTouch(owner, touchX, touchY);
+  moveTouch(owner, coords);
 }
 
 function onTouchEnd(e) {
@@ -96,14 +106,12 @@ function onTouchEnd(e) {
 
   // Set style
   $("#touch-local").removeClass("touching");
+  $("body").removeClass("real-touch");
 
   socket.emit("touchend", false)
-
 }
 
-
 function onTouchMove(e) {
-  console.log("ON TOUCH MOVE");
   e.preventDefault();
 
   // Gather coordinates
@@ -112,16 +120,32 @@ function onTouchMove(e) {
   var touchY = touch.pageY;
 
   // Set & send data object
-  var data = {
+  localCoords = {
     x: touchX,
     y: touchY
   };
 
-  sendTouchData("touchmove", data);
+  // console.log("ON TOUCH MOVE: " + localCoords.x + ":" + otherCoords.x + " " + localCoords.y + ":" + otherCoords.y);
+
+
+  if (localCoords.x > (otherCoords.x - 32) &&
+    localCoords.x < (otherCoords.x + 32) &&
+    localCoords.y > (otherCoords.y - 32) &&
+    localCoords.y < (otherCoords.y + 32)) {
+    console.log("REAL TOUCH");
+
+
+    $("body").addClass("real-touch");
+
+  } else {
+    $("body").removeClass("real-touch");
+  };
+
+  sendTouchData("touchmove", localCoords);
 
   // Move Touch indicator
   var owner = $("#touch-local");
-  moveTouch(owner, touchX, touchY);
+  moveTouch(owner, localCoords);
 }
 
 function sendTouchData(eventName, data) {
@@ -129,11 +153,10 @@ function sendTouchData(eventName, data) {
   socket.emit(eventName, data);
 };
 
-
-function moveTouch(owner, x, y) {
+function moveTouch(owner, coords) {
   owner.css({
-    left: x,
-    top: y
+    left: coords.x,
+    top: coords.y
   });
 }
 
