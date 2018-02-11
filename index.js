@@ -10,8 +10,8 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-
   console.log('NODE: user connected');
+  io.emit('clientsCount', io.engine.clientsCount); // need broadcast flag
 
   // On TOUCHMOVE
   socket.on('touchmove', (coords) => {
@@ -29,6 +29,7 @@ io.on('connection', (socket) => {
   // On DISCONNECT
   socket.on('disconnect', () => {
     console.log('NODE: user disconnected'); // Can't fire
+    io.emit('clientsCount', io.engine.clientsCount); // need broadcast flag
   })
 })
 

@@ -1,15 +1,17 @@
 var socket = io();
-var localCoords = {
-  x: 0,
-  y: 0
+
+var localTouchPosition = {
+  x: null,
+  y: null
 }
-var otherCoords = {
-  x: 0,
-  y: 0
+var otherTouchPosition = {
+  x: null,
+  y: null
 }
 
 $(document).ready(function() {
   console.log("DOCUMENT READY");
+
   addListeners();
   setupConnection();
 });
@@ -19,41 +21,53 @@ function setupConnection() {
   // CONNECT
   socket.on('connect', () => {
     console.log("RECEIVED: connect");
+    // console.log(socket);
   });
 
+  socket.on('clientsCount', (numberOfConnectedClients) => {
+    console.log(numberOfConnectedClients);
+    updateClientsStatus(numberOfConnectedClients);
+  })
+
   // TOUCHMOVE
-  socket.on('touchmove', (coords) => {
+  socket.on('touchmove', (position) => {
     console.log("RECEIVED: touchmove");
 
-    otherCoords = coords;
+    otherTouchPosition = position;
+
+    checkOverlapping();
 
     var owner = $("#touch-other");
-    moveTouch(owner, coords);
+    moveTouch(owner, position);
   });
 
   // TOUCHSTART
-  socket.on('touchstart', (coords) => {
+  socket.on('touchstart', (position) => {
     console.log("RECEIVED: touchstart");
 
-    otherCoords = coords;
+    otherTouchPosition = position;
 
     $("#touch-other").addClass("touching");
     // $("body").addClass("touching");
 
     var owner = $("#touch-other");
-    moveTouch(owner, coords);
+    moveTouch(owner, position);
   });
 
   // TOUCHEND
   socket.on('touchend', (didHappen) => {
     console.log("RECEIVED: touchend");
 
+    otherTouchPosition = {
+      x: null,
+      y: null
+    }
+
     $("#touch-other").addClass("touching").delay(125).queue(function() {
       $(this).removeClass("touching").dequeue();
     });
 
     $("body").removeClass("real-touch");
-
 
     // $("body").addClass("touching").delay(125).queue(function() {
     //   $(this).removeClass("touching").dequeue();
@@ -64,11 +78,13 @@ function setupConnection() {
 
 function addListeners() {
   // TOUCHMOVE
-  document.addEventListener('touchmove', throttle(onTouchMove, 10), false);
+  document.addEventListener('touchmove', throttle(onTouchMove, 25), false);
+
   // TOUCHSTART
   document.addEventListener('touchstart', (e) => {
     onTouchStart(e);
   }, false);
+
   // TOUCHEND
   document.addEventListener('touchend', (e) => {
     onTouchEnd(e);
@@ -78,7 +94,6 @@ function addListeners() {
 function onTouchStart(e) {
   console.log("ON TOUCH START");
   e.preventDefault();
-
   // Set style
   $("#touch-local").addClass("touching");
 
@@ -87,26 +102,30 @@ function onTouchStart(e) {
   var touchX = touch.pageX;
   var touchY = touch.pageY;
 
-  // Set & send data object
-  var coords = {
+  // Set local coordinates
+  localTouchPosition = {
     x: touchX,
     y: touchY
   };
 
-  sendTouchData("touchstart", coords);
+  sendTouchData("touchstart", localTouchPosition);
 
   // Move Touch indicator
   var owner = $("#touch-local");
-  moveTouch(owner, coords);
+  moveTouch(owner, localTouchPosition);
 }
 
 function onTouchEnd(e) {
   console.log("ON TOUCH END");
-  e.preventDefault();
 
   // Set style
   $("#touch-local").removeClass("touching");
   $("body").removeClass("real-touch");
+
+  localTouchPosition = {
+    x: null,
+    y: null
+  }
 
   socket.emit("touchend", false)
 }
@@ -120,47 +139,32 @@ function onTouchMove(e) {
   var touchY = touch.pageY;
 
   // Set & send data object
-  localCoords = {
+  localTouchPosition = {
     x: touchX,
     y: touchY
   };
 
-  // console.log("ON TOUCH MOVE: " + localCoords.x + ":" + otherCoords.x + " " + localCoords.y + ":" + otherCoords.y);
+  checkOverlapping();
 
-
-  if (localCoords.x > (otherCoords.x - 32) &&
-    localCoords.x < (otherCoords.x + 32) &&
-    localCoords.y > (otherCoords.y - 32) &&
-    localCoords.y < (otherCoords.y + 32)) {
-    console.log("REAL TOUCH");
-
-
-    $("body").addClass("real-touch");
-
-  } else {
-    $("body").removeClass("real-touch");
-  };
-
-  sendTouchData("touchmove", localCoords);
+  sendTouchData("touchmove", localTouchPosition);
 
   // Move Touch indicator
   var owner = $("#touch-local");
-  moveTouch(owner, localCoords);
+  moveTouch(owner, localTouchPosition);
 }
 
 function sendTouchData(eventName, data) {
-  console.log(eventName);
   socket.emit(eventName, data);
 };
 
-function moveTouch(owner, coords) {
+function moveTouch(owner, position) {
   owner.css({
-    left: coords.x,
-    top: coords.y
+    left: position.x,
+    top: position.y
   });
 }
 
-// limit the number of events per second
+// Limit the number of events per second
 function throttle(callback, delay) {
   var previousCall = new Date().getTime();
   return function() {
@@ -171,4 +175,31 @@ function throttle(callback, delay) {
       callback.apply(null, arguments);
     }
   };
+}
+
+// localTouchPosition
+
+function checkOverlapping() {
+  if (localTouchPosition.x > (otherTouchPosition.x - 32) &&
+    localTouchPosition.x < (otherTouchPosition.x + 32) &&
+    localTouchPosition.y > (otherTouchPosition.y - 32) &&
+    localTouchPosition.y < (otherTouchPosition.y + 32)) {
+    console.log("OVERLAP");
+
+    $("body").addClass("real-touch");
+
+  } else {
+    $("body").removeClass("real-touch");
+  };
+}
+
+function updateClientsStatus(numberOfConnectedClients) {
+  if (numberOfConnectedClients <= 1) {
+    $("#clients-status").html("Waiting for your friend…");
+  } else if (numberOfConnectedClients == 2) {
+    $("#clients-status").html("Your friend is here!");
+  } else if (numberOfConnectedClients > 2) {
+    $("#clients-status").html("Your friends are here!");
+  }
+
 }
