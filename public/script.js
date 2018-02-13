@@ -9,29 +9,31 @@ var otherTouchPosition = {
   y: null
 }
 
-$(document).ready(function() {
-  console.log("DOCUMENT READY");
+var space = "";
 
+$(document).ready(function() {
+  logAction("document", "ready");
   addListeners();
   setupConnection();
+  addSpaceIdToURL();
 });
 
 function setupConnection() {
 
   // CONNECT
   socket.on('connect', () => {
-    console.log("RECEIVED: connect");
-    // console.log(socket);
+    logAction("socket", "connect");
+    socket.emit("join", space);
   });
 
   socket.on('clientsCount', (numberOfConnectedClients) => {
-    console.log(numberOfConnectedClients);
+    logAction("number of clients", numberOfConnectedClients);
     updateClientsStatus(numberOfConnectedClients);
   })
 
   // TOUCHMOVE
   socket.on('touchmove', (position) => {
-    console.log("RECEIVED: touchmove");
+    logAction("received", "touchmove");
 
     otherTouchPosition = position;
 
@@ -43,7 +45,7 @@ function setupConnection() {
 
   // TOUCHSTART
   socket.on('touchstart', (position) => {
-    console.log("RECEIVED: touchstart");
+    logAction("received", "touchstart");
 
     otherTouchPosition = position;
 
@@ -56,7 +58,7 @@ function setupConnection() {
 
   // TOUCHEND
   socket.on('touchend', (didHappen) => {
-    console.log("RECEIVED: touchend");
+    logAction("received", "touchend");
 
     otherTouchPosition = {
       x: null,
@@ -77,6 +79,20 @@ function setupConnection() {
 };
 
 function addListeners() {
+  // FOCUS
+  window.addEventListener("focus", (e) => {
+    socket.emit("join", space);
+    // socket.open()
+    logAction("window", "focus");
+  });
+
+  // BLUR
+  window.addEventListener("blur", (e) => {
+    socket.emit("leave", space);
+    // socket.close();
+    logAction("window", "blur");
+  })
+
   // TOUCHMOVE
   document.addEventListener('touchmove', throttle(onTouchMove, 25), false);
 
@@ -92,7 +108,7 @@ function addListeners() {
 };
 
 function onTouchStart(e) {
-  console.log("ON TOUCH START");
+  logAction("touch", "start");
   e.preventDefault();
   // Set style
   $("#touch-local").addClass("touching");
@@ -116,7 +132,7 @@ function onTouchStart(e) {
 }
 
 function onTouchEnd(e) {
-  console.log("ON TOUCH END");
+  logAction("touch", "end");
 
   // Set style
   $("#touch-local").removeClass("touching");
@@ -132,6 +148,7 @@ function onTouchEnd(e) {
 
 function onTouchMove(e) {
   e.preventDefault();
+  logAction("touch", "move");
 
   // Gather coordinates
   var touch = e.touches[0];
@@ -154,6 +171,7 @@ function onTouchMove(e) {
 }
 
 function sendTouchData(eventName, data) {
+  data.space = space;
   socket.emit(eventName, data);
 };
 
@@ -184,7 +202,8 @@ function checkOverlapping() {
     localTouchPosition.x < (otherTouchPosition.x + 32) &&
     localTouchPosition.y > (otherTouchPosition.y - 32) &&
     localTouchPosition.y < (otherTouchPosition.y + 32)) {
-    console.log("OVERLAP");
+
+    logAction("touch", "overlap");
 
     $("body").addClass("real-touch");
 
@@ -195,11 +214,44 @@ function checkOverlapping() {
 
 function updateClientsStatus(numberOfConnectedClients) {
   if (numberOfConnectedClients <= 1) {
-    $("#clients-status").html("Waiting for your friend…");
+    $("#clients-status").html("Waiting for your friend");
   } else if (numberOfConnectedClients == 2) {
-    $("#clients-status").html("Your friend is here!");
+    $("#clients-status").html("Your friend is here");
   } else if (numberOfConnectedClients > 2) {
-    $("#clients-status").html("Your friends are here!");
+    $("#clients-status").html("Your friends are here");
   }
+}
 
+function logAction(category, action) {
+  console.log(category.toUpperCase() + ": " + action);
+  $("#version").append(category.toUpperCase() + ": " + action + "<br>");
+}
+
+function addSpaceIdToURL() {
+  if (document.location.search == "") {
+    logAction("space", "empty");
+    space = getGeneratedSpace();
+    var spaceURI = encodeURI(space);
+    document.location.search = spaceURI;
+  } else {
+    space = document.location.search.substring(1);
+    sendTouchData("join", space);
+    logAction("space", space);
+    //
+  }
+}
+
+function getGeneratedSpace() {
+
+  var consonants = "bcdfghjklmnpqrstvwxz".split('');
+  var vowels = "aeiouy".split('');
+  var numbers = '0123456789'.split('');
+  var space = "";
+
+  space = consonants[Math.floor(Math.random() * 20)];
+  space += vowels[Math.floor(Math.random() * 6)];
+  space += consonants[Math.floor(Math.random() * 20)];
+  space += vowels[Math.floor(Math.random() * 6)];
+  for (var i = 0; i < 4; i++) space += numbers[Math.floor(Math.random() * 10)];
+  return space;
 }
