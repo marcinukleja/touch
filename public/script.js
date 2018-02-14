@@ -16,6 +16,8 @@ $(document).ready(function() {
   addSpaceIdToURL();
   addListeners();
   setupConnection();
+  // insertLink();
+  // setupActionButton();
 });
 
 function setupConnection() {
@@ -227,4 +229,19 @@ function getGeneratedSpace() {
   space += vowels[Math.floor(Math.random() * 6)];
   for (var i = 0; i < 4; i++) space += numbers[Math.floor(Math.random() * 10)];
   return space;
+}
+
+function insertLink() {
+  var link = window.location.href;
+  $("#link").val(link);
+  logAction("link", link);
+}
+
+function setupActionButton() {
+  $("#action").on("touchstart", (e) => {
+    var linkObject = $("#link");
+    linkObject.select();
+    document.execCommand('cut');
+    logAction("action", "hit");
+  });
 }

@@ -63,19 +63,22 @@ body {
   font-weight: 300;
   margin-bottom: 8px;
   color: hsl(0, 100%, 100%);
+  padding: 0 16px;
 }
 
 #secondary {
   font-size: 16px;
   margin-bottom: 8px;
   color: hsl(0, 100%, 100%);
-  opacity: .25
+  opacity: .25;
+  padding: 0 16px;
 }
 
 #action {
   margin-bottom: 8px;
-  opacity: .5;
+  opacity: 1;
   color: hsl(330, 100%, 50%);
+  padding: 0 16px;
 }
 
 #version {
@@ -84,8 +87,27 @@ body {
   position: absolute;
   bottom: 16px;
   left: 16px;
-  display: none;
+  /* display: none; */
   opacity: .25;
+}
+
+#link {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #333;
+  border: none;
+  border-radius: 0;
+  border-image: none;
+  color: #fff;
+  width: 100%;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: .25;
+  margin: 0 0 8px 0;
+  line-height: 24px;
+  display: block;
+  height: 24px;
 }
 
 #loader {
