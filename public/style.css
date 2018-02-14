@@ -3,31 +3,24 @@ html {
   background-color: #000;
 }
 
-body,
-html {
+body, html {
   overflow: hidden;
-
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
-
   color: #fff;
 }
 
-body,
-body * {
+body, body * {
   font-family: -apple-system, Roboto, Helvetica, Arial, sans-serif;
   font-size: 16px;
   font-weight: normal;
-
   margin: 0;
   padding: 0;
-
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
-
   -o-user-select: none;
   -khtml-user-select: none;
 }
@@ -35,13 +28,11 @@ body * {
 body {
   -webkit-transition: background-color 2s;
   transition: background-color 2s;
-
   color: #fff;
   background-color: #000;
 }
 
-#status,
-#instruction {
+#status, #instruction {
   position: absolute;
   text-align: center;
   letter-spacing: 2px;
@@ -90,12 +81,10 @@ body {
 #version {
   font-family: Menlo, monospace;
   font-weight: 100;
-
   position: absolute;
   bottom: 16px;
   left: 16px;
-
-  display: none;
+  /* display: none; */
   opacity: .25;
 }
 
@@ -140,20 +129,16 @@ body {
   }
 }
 
-#touch-local,
-#touch-other {
+#touch-local, #touch-other {
   position: absolute;
   top: 0;
   left: 0;
-
   width: 64px;
   height: 64px;
-
   -webkit-transition: opacity 1s;
   transition: opacity 1s;
   -webkit-transform: translate(-32px, -32px);
   transform: translate(-32px, -32px);
-
   opacity: 0;
   border-radius: 50%;
 }
@@ -166,11 +151,9 @@ body {
   background-color: hsla(330, 100%, 50%, .5);
 }
 
-#touch-local.touching,
-#touch-other.touching {
+#touch-local.touching, #touch-other.touching {
   -webkit-transition: none;
   transition: none;
-
   opacity: 1;
 }
 
@@ -183,6 +166,5 @@ body.touching {
 body.real-touch {
   -webkit-transition: background-color 5s;
   transition: background-color 5s;
-
   background-color: hsla(330, 100%, 50%, 1.0);
 }
