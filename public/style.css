@@ -109,13 +109,23 @@ body {
   background-color: hsla(330, 100%, 50%, 1);
   border-radius: 50%;
   opacity: 0;
-  transition: all 2s;
+  transition: opacity 2s;
   animation: none;
 }
 
 #loader.waiting {
   animation: pulse 4s infinite;
-  opacity: 0.25
+  opacity: .5;
+  transform-origin: 0% 0%;
+}
+
+@keyframes orbiting {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse {
