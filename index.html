@@ -2,11 +2,10 @@
 <html lang="en">
 
 <head>
-  <!-- <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline', style-src 'unsafe-inline'"> -->
 
   <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'" />
 
-  <!-- <meta name="mobile-web-app-capable" content="yes"> -->
+  <meta name="mobile-web-app-capable" content="yes">
 
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
@@ -22,8 +21,13 @@
 </head>
 
 <body>
-  <div id="clients-status">Waiting for your friend</div>
+  <div id="status" class="waiting">Waiting for your friend</div>
   <div id="version">build: 15<br>
+  </div>
+  <div id="loader" class="waiting"></div>
+  <div id="instruction">
+    <div id="secondary">This link is&nbsp;unique</div>
+    <div id="primary">Share&nbsp;it&nbsp;with your&nbsp;friend</div>
   </div>
   <div id="touch-local"></div>
   <div id="touch-other"></div>
