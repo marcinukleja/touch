@@ -67,6 +67,9 @@ function setupConnection() {
 };
 
 function addListeners() {
+
+  disableScroll();
+
   // FOCUS
   window.addEventListener("focus", (e) => {
     socket.emit("join", space);
@@ -80,7 +83,11 @@ function addListeners() {
   })
 
   // TOUCHMOVE
-  document.addEventListener('touchmove', throttle(onTouchMove, 25), false);
+  // document.addEventListener('touchmove', throttle(onTouchMove, 0), false);
+
+  document.addEventListener('touchmove', (e) => {
+    onTouchMove(e);
+  }, false);
 
   // TOUCHSTART
   document.addEventListener('touchstart', (e) => {
@@ -95,6 +102,7 @@ function addListeners() {
 
 function onTouchStart(e) {
   logAction("touch", "start");
+
   e.preventDefault();
 
   $("#touch-local").addClass("touching");
@@ -127,6 +135,7 @@ function onTouchEnd(e) {
 
 function onTouchMove(e) {
   e.preventDefault();
+
   logAction("touch", "move");
 
   var touch = e.touches[0];
@@ -244,4 +253,15 @@ function setupActionButton() {
     document.execCommand('cut');
     logAction("action", "hit");
   });
+}
+
+function preventDefault(e) {
+  e.preventDefault();
+}
+
+function disableScroll() {
+  document.body.addEventListener('touchmove', preventDefault, {
+    passive: false
+  });
+  logAction("action", "passive listener");
 }

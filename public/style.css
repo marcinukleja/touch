@@ -1,6 +1,7 @@
 html {
   /* overflow: hidden; */
   background-color: #000;
+  /* position: fixed; */
 }
 
 body, html {
@@ -10,6 +11,7 @@ body, html {
   margin: 0;
   padding: 0;
   color: #fff;
+  -webkit-overflow-scrolling: touch;
 }
 
 body, body * {
